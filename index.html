@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waple.be Today</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Oswald', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #a8c0ff, #d0e6f4);
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .date-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .date-selector input {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin: 0 0 10px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            font-weight: 700;
+        }
+        .item {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .item button {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            color: #333;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            width: calc(100% - 30px);
+            text-align: left;
+            border-radius: 8px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+        .item button.done {
+            background: linear-gradient(to right, #6a0dad, #00d2ff);
+            color: #fff;
+        }
+        .item button:hover {
+            background-color: #e0e0e0;
+        }
+        .item input {
+            width: calc(100% - 30px);
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            border-radius: 8px;
+        }
+        .item button.add {
+            background-color: #d0d0d0;
+            color: #333;
+        }
+        .textarea {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+            border-radius: 8px;
+        }
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .star.selected {
+            color: #ffd700;
+        }
+        /* Context menu */
+        .context-menu {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .context-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #f4f4f4;
+            cursor: pointer;
+            text-align: left;
+        }
+        .context-menu button:hover {
+            background: #e0e0e0;
+        }
+        /* Practice info styles */
+        .practice-info {
+            margin-top: 40px;
+        }
+        .practice-info h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .practice {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .practice h3 {
+            margin: 0;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+        }
+        .practice h3 span {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <div class="container">
+        <div class="header">
+            <h1>Waple.be Today</h1>
+        </div>
+        
+        <div class="date-selector">
+            <input type="date" id="date-picker">
+        </div>
+
+        <div class="section" id="focus-of-attention">
+            <h2>Focus of Attention</h2>
+            <div id="focus-list">
+                <!-- Existing focus items will be inserted here -->
+            </div>
+            <div class="item">
+                <input type="text" id="new-focus" placeholder="Add new focus">
+                <button class="add" onclick="addFocus()">Add Focus</button>
+            </div>
+        </div>
+
+        <div class="section" id="tasks">
+            <h2>Tasks</h2>
+            <div id="task-list">
+                <!-- Existing tasks will be inserted here -->
+            </div>
+            <div class="item">
+                <input type="text" id="new-task" placeholder="Add new task">
+                <button class="add" onclick="addTask()">Add Task</button>
+            </div>
+        </div>
+
+        <div class="section" id="mood">
+            <h2>Mood</h2>
+            <div class="stars">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <input type="hidden" id="mood-rating" value="0">
+        </div>
+
+        <div class="section" id="comments">
+            <h2>Daily Comment</h2>
+            <textarea id="comment-input" class="textarea" placeholder="Add your comments here..."></textarea>
+        </div>
+
+        <div class="practice-info">
+            <h2>Практики</h2>
+            <div class="practice">
+                <h3><span>💪</span> Body</h3>
+                <p>Просто делайте что-то для тела, это могут быть любые упражнения.</p>
+            </div>
+            <div class="practice">
+                <h3><span>👈</span> Left Focus</h3>
+                <p>Фокусируйте внимание на левом виске, удерживая мудру большой, указательный и средний пальцы.</p>
+            </div>
+            <div class="practice">
+                <h3><span>👉</span> Right Focus</h3>
+                <p>Удерживайте внимание на правом виске, мудра большой, мизинец и безымянный пальцы.</p>
+            </div>
+            <div class="practice">
+                <h3><span>👁️</span> Middle Focus</h3>
+                <p>Удерживайте внимание на третьем глазе, область между бровями. Мудра: ладони вверх, скрещиваем пальцы и объединяем так, чтобы подушечки касались друг друга. Повторяйте мантру "Я - сознание" в такт с дыханием.</p>
+            </div>
+            <div class="practice">
+                <h3><span>🙏</span> Gratitude</h3>
+                <p>Благодарность, испытывайте чувство благодарности в любой форме.</p>
+            </div>
+            <div class="practice">
+                <h3><span>❤️</span> Love</h3>
+                <p>Испытывайте и проявляйте любовь.</p>
+            </div>
+            <div class="practice">
+                <h3><span>🧠</span> Self-Programming</h3>
+                <p>Проговаривайте позитивные аффирмации, например "Я мыслю позитивно".</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="context-menu" id="context-menu">
+        <button onclick="deleteItem()">Delete</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            document.getElementById('date-picker').addEventListener('change', () => {
+                loadData();
+            });
+            document.querySelectorAll('#mood .star').forEach(star => {
+                star.addEventListener('click', () => {
+                    setMood(star.dataset.value);
+                });
+            });
+        });
+
+        function saveData() {
+            const selectedDate = document.getElementById('date-picker').value || new Date().toISOString().split('T')[0];
+            const focusList = [];
+            document.querySelectorAll('#focus-list .focus-button').forEach(button => {
+                focusList.push({ text: button.textContent, done: button.classList.contains('done') });
+            });
+            localStorage.setItem(`focusList_${selectedDate}`, JSON.stringify(focusList));
+
+            const taskList = [];
+            document.querySelectorAll('#task-list .task-button').forEach(button => {
+                taskList.push({ text: button.textContent, done: button.classList.contains('done') });
+            });
+            localStorage.setItem(`taskList_${selectedDate}`, JSON.stringify(taskList));
+
+            const moodRating = document.getElementById('mood-rating').value;
+            localStorage.setItem(`moodRating_${selectedDate}`, moodRating);
+
+            const comment = document.getElementById('comment-input').value;
+            localStorage.setItem(`comment_${selectedDate}`, comment);
+        }
+
+        function loadData() {
+            const selectedDate = document.getElementById('date-picker').value || new Date().toISOString().split('T')[0];
+            document.getElementById('date-picker').value = selectedDate;
+
+            const defaultFocuses = [
+                "Body",
+                "Left focus",
+                "Right focus",
+                "Middle focus",
+                "Gratitude",
+                "Love",
+                "Self-programming"
+            ];
+
+            const focusList = JSON.parse(localStorage.getItem(`focusList_${selectedDate}`) || JSON.stringify(defaultFocuses.map(focus => ({ text: focus, done: false }))));
+            const taskList = JSON.parse(localStorage.getItem(`taskList_${selectedDate}`) || '[]');
+            const moodRating = localStorage.getItem(`moodRating_${selectedDate}`) || '0';
+            const comment = localStorage.getItem(`comment_${selectedDate}`) || '';
+
+            const focusListContainer = document.getElementById('focus-list');
+            focusListContainer.innerHTML = '';
+            focusList.forEach((focus, index) => {
+                const newFocus = document.createElement('div');
+                newFocus.className = 'item';
+                newFocus.innerHTML = `
+                    <button class="focus-button ${focus.done ? 'done' : ''}" data-id="${index}">${focus.text}</button>
+                `;
+                focusListContainer.appendChild(newFocus);
+            });
+
+            const taskListContainer = document.getElementById('task-list');
+            taskListContainer.innerHTML = '';
+            taskList.forEach((task, index) => {
+                const newTask = document.createElement('div');
+                newTask.className = 'item';
+                newTask.innerHTML = `
+                    <button class="task-button ${task.done ? 'done' : ''}" data-id="${index}">${task.text}</button>
+                `;
+                taskListContainer.appendChild(newTask);
+            });
+
+            document.getElementById('mood-rating').value = moodRating;
+            document.querySelectorAll('#mood .star').forEach(star => {
+                if (star.dataset.value <= moodRating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+
+            document.getElementById('comment-input').value = comment;
+        }
+
+        function addFocus() {
+            const newFocus = document.getElementById('new-focus').value.trim();
+            if (newFocus) {
+                const focusListContainer = document.getElementById('focus-list');
+                const newFocusItem = document.createElement('div');
+                newFocusItem.className = 'item';
+                newFocusItem.innerHTML = `
+                    <button class="focus-button" data-id="${document.querySelectorAll('#focus-list .focus-button').length}">${newFocus}</button>
+                `;
+                focusListContainer.appendChild(newFocusItem);
+                document.getElementById('new-focus').value = '';
+                saveData();
+            }
+        }
+
+        function addTask() {
+            const newTask = document.getElementById('new-task').value.trim();
+            if (newTask) {
+                const taskListContainer = document.getElementById('task-list');
+                const newTaskItem = document.createElement('div');
+                newTaskItem.className = 'item';
+                newTaskItem.innerHTML = `
+                    <button class="task-button" data-id="${document.querySelectorAll('#task-list .task-button').length}">${newTask}</button>
+                `;
+                taskListContainer.appendChild(newTaskItem);
+                document.getElementById('new-task').value = '';
+                saveData();
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('focus-button') || event.target.classList.contains('task-button')) {
+                event.target.classList.toggle('done');
+                saveData();
+            }
+        });
+
+        document.addEventListener('contextmenu', (event) => {
+            if (event.target.classList.contains('focus-button') || event.target.classList.contains('task-button')) {
+                event.preventDefault();
+                const contextMenu = document.getElementById('context-menu');
+                contextMenu.style.display = 'block';
+                contextMenu.style.top = `${event.clientY}px`;
+                contextMenu.style.left = `${event.clientX}px`;
+                contextMenu.dataset.targetId = event.target.dataset.id;
+                contextMenu.dataset.type = event.target.classList.contains('focus-button') ? 'focus' : 'task';
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#context-menu')) {
+                document.getElementById('context-menu').style.display = 'none';
+            }
+        });
+
+        function deleteItem() {
+            const contextMenu = document.getElementById('context-menu');
+            const targetId = contextMenu.dataset.targetId;
+            const type = contextMenu.dataset.type;
+
+            if (type === 'focus') {
+                const focusListContainer = document.getElementById('focus-list');
+                const focusItem = focusListContainer.querySelector(`.focus-button[data-id="${targetId}"]`).parentElement;
+                if (focusItem) {
+                    focusItem.remove();
+                }
+            } else if (type === 'task') {
+                const taskListContainer = document.getElementById('task-list');
+                const taskItem = taskListContainer.querySelector(`.task-button[data-id="${targetId}"]`).parentElement;
+                if (taskItem) {
+                    taskItem.remove();
+                }
+            }
+
+            saveData();
+            contextMenu.style.display = 'none';
+        }
+
+        function setMood(value) {
+            document.getElementById('mood-rating').value = value;
+            document.querySelectorAll('#mood .star').forEach(star => {
+                if (star.dataset.value <= value) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+            saveData();
+        }
+    </script>
+</body>
+</html>
